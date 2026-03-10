@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Aisha Khan",
+    "email": "aisha@example.com",
+    "age": 21
+  },
+  {
+    "id": 2,
+    "name": "Rahul Nair",
+    "email": "rahul@example.com",
+    "age": 23
+  },
+  {
+    "id": 3,
+    "name": "Sneha Das",
+    "email": "sneha@example.com",
+    "age": 22
+  },
+  {
+    "id": 1773119273421,
+    "name": "umesh",
+    "email": "suresh@gmail.com",
+    "age": 24
+  },
+  {
+    "id": 1773121110588,
+    "name": "banglore",
+    "email": "bg@example.com",
+    "age": 25
+  }
+]

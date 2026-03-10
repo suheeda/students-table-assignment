@@ -1,0 +1,7 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+  background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 40%, #ecfeff 100%);
+  color: #0f172a;
+}
