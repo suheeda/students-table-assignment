@@ -6,7 +6,6 @@ const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const DATA_FILE = path.resolve(__dirname, "data", "students.json");
-const FRONTEND_BUILD_PATH = path.resolve(__dirname, "..", "frontend", "build");
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +15,10 @@ const writeStudents = (students) =>
   fs.writeFileSync(DATA_FILE, JSON.stringify(students, null, 2));
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+app.get("/", (_req, res) => {
+  res.send("Students backend is running");
+});
 
 app.get("/api/health", (_req, res) => {
   res.json({ ok: true, message: "Backend is running" });
@@ -115,14 +118,6 @@ app.delete("/api/students/:id", async (req, res) => {
   writeStudents(students);
 
   res.json({ message: "Student deleted successfully.", deletedStudent });
-});
-
-// Serve React build
-app.use(express.static(FRONTEND_BUILD_PATH));
-
-app.get("*", (_req, res) => {
-  const indexFile = path.resolve(FRONTEND_BUILD_PATH, "index.html");
-  res.sendFile(indexFile);
 });
 
 app.listen(PORT, "0.0.0.0", () => {
