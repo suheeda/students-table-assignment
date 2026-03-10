@@ -5,8 +5,8 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const DATA_FILE = path.join(__dirname, "data", "students.json");
-const FRONTEND_BUILD_PATH = path.join(__dirname, "../frontend/build");
+const DATA_FILE = path.resolve(__dirname, "data", "students.json");
+const FRONTEND_BUILD_PATH = path.resolve(__dirname, "..", "frontend", "build");
 
 app.use(cors());
 app.use(express.json());
@@ -22,12 +22,12 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.get("/api/students", async (_req, res) => {
-  await delay(500);
+  await delay(300);
   res.json(readStudents());
 });
 
 app.post("/api/students", async (req, res) => {
-  await delay(500);
+  await delay(300);
   const { name, email, age } = req.body;
 
   if (!name || !email || !age) {
@@ -61,7 +61,7 @@ app.post("/api/students", async (req, res) => {
 });
 
 app.put("/api/students/:id", async (req, res) => {
-  await delay(500);
+  await delay(300);
   const id = Number(req.params.id);
   const { name, email, age } = req.body;
 
@@ -101,7 +101,7 @@ app.put("/api/students/:id", async (req, res) => {
 });
 
 app.delete("/api/students/:id", async (req, res) => {
-  await delay(500);
+  await delay(300);
   const id = Number(req.params.id);
   const students = readStudents();
   const index = students.findIndex((s) => s.id === id);
@@ -117,13 +117,14 @@ app.delete("/api/students/:id", async (req, res) => {
   res.json({ message: "Student deleted successfully.", deletedStudent });
 });
 
-/* Serve frontend build */
+// Serve React build
 app.use(express.static(FRONTEND_BUILD_PATH));
 
 app.get("*", (_req, res) => {
-  res.sendFile(path.join(FRONTEND_BUILD_PATH, "index.html"));
+  const indexFile = path.resolve(FRONTEND_BUILD_PATH, "index.html");
+  res.sendFile(indexFile);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });

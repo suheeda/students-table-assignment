@@ -5,7 +5,12 @@ import StudentTable from "./components/StudentTable";
 import ConfirmModal from "./components/ConfirmModal";
 import "./styles/app.css";
 
-const API_URL = "http://localhost:5000/api/students";
+const API_BASE =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000"
+    : "";
+
+const API_URL = `${API_BASE}/api/students`;
 
 export default function App() {
   const [students, setStudents] = useState([]);
@@ -35,28 +40,46 @@ export default function App() {
     }
   };
 
-  useEffect(() => { fetchStudents(); }, []);
+  useEffect(() => {
+    fetchStudents();
+  }, []);
 
   const filteredStudents = useMemo(() => {
     const q = searchTerm.trim().toLowerCase();
     if (!q) return students;
-    return students.filter((student) => student.name.toLowerCase().includes(q) || student.email.toLowerCase().includes(q));
+    return students.filter(
+      (student) =>
+        student.name.toLowerCase().includes(q) ||
+        student.email.toLowerCase().includes(q)
+    );
   }, [students, searchTerm]);
 
   const handleAddOrUpdate = async (studentData) => {
     try {
       setFormLoading(true);
       const isEditing = Boolean(editingStudent);
-      const response = await fetch(isEditing ? `${API_URL}/${editingStudent.id}` : API_URL, {
-        method: isEditing ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(studentData)
-      });
+
+      const response = await fetch(
+        isEditing ? `${API_URL}/${editingStudent.id}` : API_URL,
+        {
+          method: isEditing ? "PUT" : "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(studentData),
+        }
+      );
+
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Something went wrong.");
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong.");
+      }
+
       await fetchStudents();
       setEditingStudent(null);
-      showNotice("success", isEditing ? "Student updated successfully." : "Student added successfully.");
+      showNotice(
+        "success",
+        isEditing ? "Student updated successfully." : "Student added successfully."
+      );
     } catch (error) {
       showNotice("error", error.message || "Operation failed.");
     } finally {
@@ -66,14 +89,27 @@ export default function App() {
 
   const handleDelete = async () => {
     if (!deleteCandidate) return;
+
     try {
       setDeleteLoading(true);
-      const response = await fetch(`${API_URL}/${deleteCandidate.id}`, { method: "DELETE" });
+
+      const response = await fetch(`${API_URL}/${deleteCandidate.id}`, {
+        method: "DELETE",
+      });
+
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Delete failed.");
+
+      if (!response.ok) {
+        throw new Error(data.message || "Delete failed.");
+      }
+
       await fetchStudents();
       setDeleteCandidate(null);
-      if (editingStudent && editingStudent.id === deleteCandidate.id) setEditingStudent(null);
+
+      if (editingStudent && editingStudent.id === deleteCandidate.id) {
+        setEditingStudent(null);
+      }
+
       showNotice("success", "Student deleted successfully.");
     } catch (error) {
       showNotice("error", error.message || "Delete failed.");
@@ -83,7 +119,12 @@ export default function App() {
   };
 
   const exportRows = (rows, fileName) => {
-    const exportData = rows.map((student) => ({ Name: student.name, Email: student.email, Age: student.age }));
+    const exportData = rows.map((student) => ({
+      Name: student.name,
+      Email: student.email,
+      Age: student.age,
+    }));
+
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
@@ -97,8 +138,8 @@ export default function App() {
           <div className="card">
             <h1 className="title">Students Table Dashboard</h1>
             <p className="subtitle">
-              A polished full-stack assignment using React and Express with CRUD operations, validation,
-              search, loading states, delete confirmation, and Excel export.
+              A polished full-stack assignment using React and Express with CRUD operations,
+              validation, search, loading states, delete confirmation, and Excel export.
             </p>
             <div className="badge-row">
               <span className="badge">React Frontend</span>
@@ -119,12 +160,20 @@ export default function App() {
                 <div className="stat-value">{filteredStudents.length}</div>
               </div>
             </div>
-            {notice.message && <div className={`notice ${notice.type}`}>{notice.message}</div>}
+            {notice.message && (
+              <div className={`notice ${notice.type}`}>{notice.message}</div>
+            )}
           </div>
         </div>
 
         <div className="grid">
-          <StudentForm onSubmit={handleAddOrUpdate} editingStudent={editingStudent} loading={formLoading} onCancelEdit={() => setEditingStudent(null)} />
+          <StudentForm
+            onSubmit={handleAddOrUpdate}
+            editingStudent={editingStudent}
+            loading={formLoading}
+            onCancelEdit={() => setEditingStudent(null)}
+          />
+
           <StudentTable
             students={filteredStudents}
             loading={loading}
@@ -132,7 +181,9 @@ export default function App() {
             onDelete={setDeleteCandidate}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
-            onExportFiltered={() => exportRows(filteredStudents, "filtered_students.xlsx")}
+            onExportFiltered={() =>
+              exportRows(filteredStudents, "filtered_students.xlsx")
+            }
             onExportAll={() => exportRows(students, "all_students.xlsx")}
           />
         </div>
@@ -140,7 +191,11 @@ export default function App() {
         <ConfirmModal
           open={Boolean(deleteCandidate)}
           title="Delete Student"
-          message={deleteCandidate ? `Are you sure you want to delete ${deleteCandidate.name}?` : ""}
+          message={
+            deleteCandidate
+              ? `Are you sure you want to delete ${deleteCandidate.name}?`
+              : ""
+          }
           onCancel={() => setDeleteCandidate(null)}
           onConfirm={handleDelete}
           loading={deleteLoading}
