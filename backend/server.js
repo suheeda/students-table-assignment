@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 const DATA_FILE = path.resolve(__dirname, "data", "students.json");
 const FRONTEND_BUILD_PATH = path.resolve(__dirname, "..", "frontend", "build");
 
@@ -117,12 +117,10 @@ app.delete("/api/students/:id", async (req, res) => {
   res.json({ message: "Student deleted successfully.", deletedStudent });
 });
 
-// Serve React build
 app.use(express.static(FRONTEND_BUILD_PATH));
 
 app.get("*", (_req, res) => {
-  const indexFile = path.resolve(FRONTEND_BUILD_PATH, "index.html");
-  res.sendFile(indexFile);
+  res.sendFile(path.join(FRONTEND_BUILD_PATH, "index.html"));
 });
 
 app.listen(PORT, "0.0.0.0", () => {
