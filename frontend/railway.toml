@@ -1,0 +1,13 @@
+[build]
+builder = "RAILPACK"
+buildCommand = "cd frontend && npm install && npm run build && cd ../backend && npm install"
+
+[deploy]
+startCommand = "cd backend && node server.js"
+healthcheckPath = "/api/health"
+restartPolicyType = "ON_FAILURE"
+healthcheckTimeout = 100
+
+[node]
+nodeVersion = "20"
+packageManager = "npm"
